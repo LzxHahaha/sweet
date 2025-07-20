@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>喜糖搭配工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+        }
+
+        .candy-list, .scheme-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .candy-item, .scheme-item {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .candy-item:hover, .scheme-item:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .candy-item h4, .scheme-item h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .candy-item p, .scheme-item p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .price {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .scheme-candies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .scheme-candy-tag {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .remove-candy {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .candy-list, .scheme-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .candy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .candy-grid-item {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            position: relative;
+        }
+
+        .candy-grid-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .candy-grid-item.selected {
+            border-color: #4ecdc4;
+            background: #f0fffe;
+        }
+
+        .candy-grid-item.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            color: #4ecdc4;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .candy-grid-item h5 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .candy-grid-item .price {
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .details-cell {
+            max-width: 200px;
+        }
+
+        .detail-item {
+            font-size: 12px;
+            margin-bottom: 2px;
+            padding: 2px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💖 喜糖搭配工具</h1>
+            <p>轻松管理你的喜糖方案，找到最完美的搭配</p>
+        </div>
+
+        <div class="main-content">
+            <!-- 糖果管理 -->
+            <div class="section">
+                <h2>🍬 糖果管理</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="candyBrand">品牌</label>
+                        <input type="text" id="candyBrand" placeholder="例如：费列罗">
+                    </div>
+                    <div class="form-group">
+                        <label for="candyType">类型</label>
+                        <select id="candyType" onchange="handleTypeChange()">
+                            <option value="">请选择类型</option>
+                            <option value="巧克力">巧克力</option>
+                            <option value="软糖">软糖</option>
+                            <option value="硬糖">硬糖</option>
+                            <option value="坚果">坚果</option>
+                            <option value="饼干">饼干</option>
+                            <option value="custom">自定义类型...</option>
+                        </select>
+                        <input type="text" id="customType" placeholder="输入自定义类型" style="display: none; margin-top: 10px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="candyPrice">价格（元/颗）</label>
+                        <input type="number" id="candyPrice" step="0.01" placeholder="例如：3.50">
+                    </div>
+                </div>
+                <button class="btn" onclick="addCandy()">添加糖果</button>
+                
+                <div class="candy-list" id="candyList">
+                    <div class="empty-state">暂无糖果，请添加一些糖果开始搭配吧！</div>
+                </div>
+            </div>
+
+            <!-- 方案管理 -->
+            <div class="section">
+                <h2>📋 方案管理</h2>
+                <button class="btn btn-success" onclick="openSchemeModal()">新建方案</button>
+                
+                <div class="scheme-list" id="schemeList">
+                    <div class="empty-state">暂无方案，点击"新建方案"开始创建吧！</div>
+                </div>
+            </div>
+
+            <!-- 价格对比表 -->
+            <div class="section">
+                <h2>💰 方案价格对比</h2>
+                <table id="priceTable">
+                    <thead>
+                        <tr>
+                            <th>方案名称</th>
+                            <th>糖果数量</th>
+                            <th>总价格（元）</th>
+                            <th>平均单价（元/颗）</th>
+                            <th>详情</th>
+                        </tr>
+                    </thead>
+                    <tbody id="priceTableBody">
+                        <tr>
+                            <td colspan="5" class="empty-state">暂无方案数据</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 方案编辑模态框 -->
+    <div id="schemeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSchemeModal()">&times;</span>
+            <h2 id="modalTitle">新建方案</h2>
+            
+            <div class="form-group">
+                <label for="schemeName">方案名称</label>
+                <input type="text" id="schemeName" placeholder="例如：经典搭配">
+            </div>
+            
+            <div class="form-group">
+                <label>选择糖果</label>
+                <div id="candyGrid" class="candy-grid">
+                    <div class="empty-state">暂无糖果可选择</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>已选糖果</label>
+                <div id="selectedCandies" class="scheme-candies">
+                    <div class="empty-state">暂未选择糖果</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="saveScheme()">保存方案</button>
+                <button class="btn" onclick="closeSchemeModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储
+        let candies = JSON.parse(localStorage.getItem('candies')) || [];
+        let schemes = JSON.parse(localStorage.getItem('schemes')) || [];
+        let candyTypes = JSON.parse(localStorage.getItem('candyTypes')) || ['巧克力', '软糖', '硬糖', '坚果', '饼干'];
+        let currentScheme = { name: '', candies: [] };
+        let editingSchemeIndex = -1;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCandies();
+            renderSchemes();
+            updatePriceTable();
+            updateTypeOptions();
+        });
+
+        // 处理类型选择变化
+        function handleTypeChange() {
+            const typeSelect = document.getElementById('candyType');
+            const customInput = document.getElementById('customType');
+            
+            if (typeSelect.value === 'custom') {
+                customInput.style.display = 'block';
+                customInput.focus();
+            } else {
+                customInput.style.display = 'none';
+                customInput.value = '';
+            }
+        }
+
+        // 更新类型选项
+        function updateTypeOptions() {
+            const typeSelect = document.getElementById('candyType');
+            const currentValue = typeSelect.value;
+            
+            typeSelect.innerHTML = `
+                <option value="">请选择类型</option>
+                ${candyTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+                <option value="custom">自定义类型...</option>
+            `;
+            
+            if (currentValue && currentValue !== 'custom') {
+                typeSelect.value = currentValue;
+            }
+        }
+
+        // 添加糖果
+        function addCandy() {
+            const brand = document.getElementById('candyBrand').value.trim();
+            const typeSelect = document.getElementById('candyType');
+            const customInput = document.getElementById('customType');
+            const price = parseFloat(document.getElementById('candyPrice').value);
+
+            let type = typeSelect.value;
+            if (type === 'custom') {
+                type = customInput.value.trim();
+                if (!type) {
+                    alert('请输入自定义类型');
+                    return;
+                }
+                // 添加新类型到列表
+                if (!candyTypes.includes(type)) {
+                    candyTypes.push(type);
+                    updateTypeOptions();
+                    localStorage.setItem('candyTypes', JSON.stringify(candyTypes));
+                }
+            }
+
+            if (!brand || !type || isNaN(price) || price <= 0) {
+                alert('请填写完整的糖果信息，价格必须大于0');
+                return;
+            }
+
+            const candy = {
+                id: Date.now(),
+                brand,
+                type,
+                price
+            };
+
+            candies.push(candy);
+            saveData();
+            renderCandies();
+            updateCandyGrid();
+
+            // 清空表单
+            document.getElementById('candyBrand').value = '';
+            typeSelect.value = '';
+            customInput.value = '';
+            customInput.style.display = 'none';
+            document.getElementById('candyPrice').value = '';
+        }
+
+        // 删除糖果
+        function deleteCandy(id) {
+            if (confirm('确定要删除这个糖果吗？')) {
+                candies = candies.filter(candy => candy.id !== id);
+                saveData();
+                renderCandies();
+                updateCandyGrid();
+                updatePriceTable();
+            }
+        }
+
+        // 渲染糖果列表
+        function renderCandies() {
+            const candyList = document.getElementById('candyList');
+            
+            if (candies.length === 0) {
+                candyList.innerHTML = '<div class="empty-state">暂无糖果，请添加一些糖果开始搭配吧！</div>';
+                return;
+            }
+
+            candyList.innerHTML = candies.map(candy => `
+                <div class="candy-item">
+                    <h4>${candy.brand} - ${candy.type}</h4>
+                    <p class="price">¥${candy.price.toFixed(2)}/颗</p>
+                    <button class="btn btn-danger" onclick="deleteCandy(${candy.id})">删除</button>
+                </div>
+            `).join('');
+        }
+
+        // 更新糖果网格
+        function updateCandyGrid() {
+            const grid = document.getElementById('candyGrid');
+            
+            if (candies.length === 0) {
+                grid.innerHTML = '<div class="empty-state">暂无糖果可选择</div>';
+                return;
+            }
+
+            grid.innerHTML = candies.map(candy => {
+                const isSelected = currentScheme.candies.some(c => c.id === candy.id);
+                return `
+                    <div class="candy-grid-item ${isSelected ? 'selected' : ''}" onclick="toggleCandyInScheme(${candy.id})">
+                        <h5>${candy.brand}</h5>
+                        <p style="margin: 2px 0; font-size: 12px; color: #666;">${candy.type}</p>
+                        <p class="price">¥${candy.price.toFixed(2)}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 切换糖果在方案中的状态
+        function toggleCandyInScheme(candyId) {
+            const candy = candies.find(c => c.id === candyId);
+            if (!candy) return;
+
+            const existingIndex = currentScheme.candies.findIndex(c => c.id === candyId);
+            
+            if (existingIndex >= 0) {
+                // 移除糖果
+                currentScheme.candies.splice(existingIndex, 1);
+            } else {
+                // 添加糖果
+                currentScheme.candies.push(candy);
+            }
+            
+            updateCandyGrid();
+            renderSelectedCandies();
+        }
+
+        // 打开方案模态框
+        function openSchemeModal(index = -1) {
+            editingSchemeIndex = index;
+            const modal = document.getElementById('schemeModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (index >= 0) {
+                // 编辑模式
+                title.textContent = '编辑方案';
+                currentScheme = { ...schemes[index], candies: [...schemes[index].candies] };
+                document.getElementById('schemeName').value = currentScheme.name;
+            } else {
+                // 新建模式
+                title.textContent = '新建方案';
+                currentScheme = { name: '', candies: [] };
+                document.getElementById('schemeName').value = '';
+            }
+            
+            updateCandyGrid();
+            renderSelectedCandies();
+            modal.style.display = 'block';
+        }
+
+        // 关闭方案模态框
+        function closeSchemeModal() {
+            document.getElementById('schemeModal').style.display = 'none';
+        }
+
+        // 从方案中移除糖果
+        function removeCandyFromScheme(candyId) {
+            currentScheme.candies = currentScheme.candies.filter(c => c.id !== candyId);
+            renderSelectedCandies();
+            updateCandyGrid();
+        }
+
+        // 渲染已选糖果（按品牌-类型名称排序）
+        function renderSelectedCandies() {
+            const container = document.getElementById('selectedCandies');
+            
+            if (currentScheme.candies.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂未选择糖果</div>';
+                return;
+            }
+
+            // 按品牌+类型名称排序
+            const sortedCandies = [...currentScheme.candies].sort((a, b) => {
+                const nameA = `${a.brand}-${a.type}`;
+                const nameB = `${b.brand}-${b.type}`;
+                return nameA.localeCompare(nameB);
+            });
+
+            container.innerHTML = sortedCandies.map(candy => `
+                <div class="scheme-candy-tag">
+                    ${candy.brand} - ${candy.type}
+                    <button class="remove-candy" onclick="removeCandyFromScheme(${candy.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        // 保存方案
+        function saveScheme() {
+            const name = document.getElementById('schemeName').value.trim();
+            
+            if (!name) {
+                alert('请输入方案名称');
+                return;
+            }
+
+            if (currentScheme.candies.length === 0) {
+                alert('请至少选择一个糖果');
+                return;
+            }
+
+            currentScheme.name = name;
+
+            if (editingSchemeIndex >= 0) {
+                schemes[editingSchemeIndex] = { ...currentScheme };
+            } else {
+                schemes.push({ ...currentScheme });
+            }
+
+            saveData();
+            renderSchemes();
+            updatePriceTable();
+            closeSchemeModal();
+        }
+
+        // 删除方案
+        function deleteScheme(index) {
+            if (confirm('确定要删除这个方案吗？')) {
+                schemes.splice(index, 1);
+                saveData();
+                renderSchemes();
+                updatePriceTable();
+            }
+        }
+
+        // 渲染方案列表
+        function renderSchemes() {
+            const schemeList = document.getElementById('schemeList');
+            
+            if (schemes.length === 0) {
+                schemeList.innerHTML = '<div class="empty-state">暂无方案，点击"新建方案"开始创建吧！</div>';
+                return;
+            }
+
+            schemeList.innerHTML = schemes.map((scheme, index) => {
+                const totalPrice = scheme.candies.reduce((sum, candy) => sum + candy.price, 0);
+                // 按品牌+类型名称排序
+                const sortedCandies = [...scheme.candies].sort((a, b) => {
+                    const nameA = `${a.brand}-${a.type}`;
+                    const nameB = `${b.brand}-${b.type}`;
+                    return nameA.localeCompare(nameB);
+                });
+                
+                return `
+                    <div class="scheme-item">
+                        <h4>${scheme.name}</h4>
+                        <p>糖果数量：${scheme.candies.length}种</p>
+                        <p class="price">总价：¥${totalPrice.toFixed(2)}</p>
+                        <div class="scheme-candies">
+                            ${sortedCandies.map(candy => `
+                                <div class="scheme-candy-tag">${candy.brand} - ${candy.type}</div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn" onclick="openSchemeModal(${index})">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteScheme(${index})">删除</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 更新价格对比表
+        function updatePriceTable() {
+            const tbody = document.getElementById('priceTableBody');
+            
+            if (schemes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">暂无方案数据</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = schemes.map(scheme => {
+                const totalPrice = scheme.candies.reduce((sum, candy) => sum + candy.price, 0);
+                const avgPrice = totalPrice / scheme.candies.length;
+                
+                // 按类型归类统计
+                const typeCount = {};
+                scheme.candies.forEach(candy => {
+                    typeCount[candy.type] = (typeCount[candy.type] || 0) + 1;
+                });
+                
+                // 构建数量显示文本
+                const countText = `${scheme.candies.length}种 (${Object.entries(typeCount)
+                    .sort(([a], [b]) => a.localeCompare(b))
+                    .map(([type, count]) => `${type}:${count}`)
+                    .join(', ')})`;
+                
+                // 构建详情列表（按名称排序）
+                const sortedCandies = [...scheme.candies].sort((a, b) => {
+                    const nameA = `${a.brand}-${a.type}`;
+                    const nameB = `${b.brand}-${b.type}`;
+                    return nameA.localeCompare(nameB);
+                });
+                
+                const details = sortedCandies.map(candy => 
+                    `<div class="detail-item">${candy.brand} - ${candy.type} (¥${candy.price.toFixed(2)})</div>`
+                ).join('');
+                
+                return `
+                    <tr>
+                        <td>${scheme.name}</td>
+                        <td>${countText}</td>
+                        <td class="price">¥${totalPrice.toFixed(2)}</td>
+                        <td>¥${avgPrice.toFixed(2)}</td>
+                        <td class="details-cell">${details}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 保存数据到本地存储
+        function saveData() {
+            localStorage.setItem('candies', JSON.stringify(candies));
+            localStorage.setItem('schemes', JSON.stringify(schemes));
+            localStorage.setItem('candyTypes', JSON.stringify(candyTypes));
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('schemeModal');
+            if (event.target === modal) {
+                closeSchemeModal();
+            }
+        }
+    </script>
+</body>
+</html>
